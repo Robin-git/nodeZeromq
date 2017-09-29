@@ -1,0 +1,25 @@
+{
+  "name": "nodezeromq",
+  "version": "1.0.0",
+  "description": "Node game with zeromq",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Robin-git/nodeZeromq.git"
+  },
+  "author": "Robin Guerin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Robin-git/nodeZeromq/issues"
+  },
+  "homepage": "https://github.com/Robin-git/nodeZeromq#readme",
+  "dependencies": {
+    "consolidate": "^0.14.5",
+    "express": "^4.16.0",
+    "mustache": "^2.3.0",
+    "pixi.js": "^4.5.6"
+  }
+}

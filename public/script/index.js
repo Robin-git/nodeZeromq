@@ -1,64 +1,84 @@
-var type = "WebGL"
-if (!PIXI.utils.isWebGLSupported()) {
-    type = "canvas"
-}
-PIXI.utils.sayHello(type)
-
 const HEIGHT = 250,
     WIDTH = 500
 
-//Aliases
-const Container = PIXI.Container,
-    autoDetectRenderer = PIXI.autoDetectRenderer,
-    loader = PIXI.loader,
-    resources = PIXI.loader.resources,
-    Sprite = PIXI.Sprite,
-    TextureCache = PIXI.TextureCache,
-    Rectangle = PIXI.Rectangle
-
 //Create a Pixi stage and renderer and add the 
 //renderer.view to the DOM
-var stage = new Container(),
-    renderer = autoDetectRenderer(WIDTH, HEIGHT);
+var stage = new PIXI.Container(),
+    renderer = PIXI.autoDetectRenderer(WIDTH, HEIGHT);
 document.body.appendChild(renderer.view);
+
+const sprites = {}
+const textures = {}
 
 PIXI.loader
     .add([
         "public/assets/images/dunjo_cover.png"
     ])
-    .on("progress", loadProgressHandler)
+    .on("progress", (loader, resources) => {
+        console.log("loading: " + resources.url);
+        console.log("progress: " + loader.progress + "%")
+    })
+    .on("load", (loader, resources) => {
+        // Wall init
+        textures.wall_up_left = new PIXI.Texture(resources.texture, new PIXI.Rectangle(43, 75, 25, 25));
+        sprites.wall_up_left = new PIXI.Sprite(textures.wall_up_left)
+
+        textures.wall_up_right = new PIXI.Texture(resources.texture, new PIXI.Rectangle(94, 75, 25, 25));
+        sprites.wall_up_right = new PIXI.Sprite(textures.wall_up_right)
+
+        textures.wall_bottom_left = new PIXI.Texture(resources.texture, new PIXI.Rectangle(43, 126, 25, 25));
+        sprites.wall_bottom_left = new PIXI.Sprite(textures.wall_bottom_left)
+
+        textures.wall_bottom_right = new PIXI.Texture(resources.texture, new PIXI.Rectangle(94, 126, 25, 25));
+        sprites.wall_bottom_right = new PIXI.Sprite(textures.wall_bottom_right)
+
+        textures.wall_right = new PIXI.Texture(resources.texture, new PIXI.Rectangle(45, 103, 25, 25));
+        sprites.wall_right = new PIXI.Sprite(textures.wall_right)
+
+        // Persona init
+        textures.player = new PIXI.Texture(resources.texture, new PIXI.Rectangle(128, 132, 14, 16));
+        sprites.player = new PIXI.Sprite(textures.player)
+    })
     .load(setup);
 
-function loadProgressHandler(loader, resource) {
-    console.log("loading: " + resource.url);
-    console.log("progress: " + loader.progress + "%")
-}
-
+// Create sound register
 createjs.Sound.registerSound("public/assets/sound/laser/laser1.wav", "laser");
+// Initialization de la map
+const MAP_SIZE = {
+    width: 5,
+    height: 5
+}
 
 function setup() {
 
-    const texture = TextureCache["public/assets/images/dunjo_cover.png"];
-    let wall;
+    // for (let i = 0; i < MAP_SIZE.width; i++) {
+    //     for (let j = 0; j < MAP_SIZE.height; i++) {
+    //         sprites.wall_right.x = 150
+    //         sprites.wall_right.y = 160
+    //         stage.addChild(sprites.wall_right)
+    //     }
+    // }
 
-    const top_right_corner = new Rectangle(43, 75, 25, 25);
-    wall = new Sprite(texture);
-    texture.frame = top_right_corner;
-    stage.addChild(wall)
+    sprites.wall_up_left.x = 0
+    sprites.wall_up_left.y = 0
+    stage.addChild(sprites.wall_up_left);
 
-    const right_wall = new Rectangle(86, 75, 25, 25);
-    wall = new Sprite(texture);
-    wall.x = 0
-    wall.y = 25
-    texture.frame = right_wall;
-    stage.addChild(wall)
+    sprites.wall_up_right.x = 100
+    sprites.wall_up_right.y = 0
+    stage.addChild(sprites.wall_up_right);
 
-    // rogue.x = HEIGHT / 2
-    // rogue.y = WIDTH / 2
-    // rogue.scale.x = 2
-    // rogue.scale.y = 2
+    sprites.wall_bottom_left.x = 0
+    sprites.wall_bottom_left.y = 100
+    stage.addChild(sprites.wall_bottom_left);
 
-    //stage.addChild(wall)
+    sprites.wall_bottom_right.x = 100
+    sprites.wall_bottom_right.y = 100
+    stage.addChild(sprites.wall_bottom_right);
+
+    sprites.player.x = 150
+    sprites.player.y = 150
+    stage.addChild(sprites.player)
+
     renderer.render(stage)
 
     createjs.Sound.play("laser");

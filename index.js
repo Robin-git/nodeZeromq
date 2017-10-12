@@ -6,8 +6,10 @@ const express = require("express"),
   io = require("socket.io")(http),
   zmq = require("zeromq"),
   sock = zmq.socket("req"),
+  logger = require('./src/logger')
   commande = require("./src/commande");
 
+let socketIsReady = true;
 sock.connect("tcp://192.168.1.25:3000");
 
 app.use("/public", express.static("public"));
@@ -36,21 +38,24 @@ app.get("/", function(req, res) {
 });
 
 io.on("connection", function(socket) {
-  console.log("a user connected");
+  logger.info("a user connected");
   setInterval(function() {
-    console.log("sending work");
+    if (socketIsReady) socketIsReady = false; else return;
+    logger.info("sending work");
     sock.send("identify|#0x01");
-    // sock.send(commande.forward);
-  }, 5000);
+    sock.identity = "#0x01";
+    sock.send(commande.forward);
+  }, 500);
   socket.on("disconnect", function() {
-    console.log("user disconnected");
+    logger.info("user disconnected");
   });
 });
 
 sock.on("message", function(msg) {
-  console.log("work: %s", msg.toString());
+  socketIsReady = true;
+  logger.info(`work: ${msg.toString()}`);
 });
 
 http.listen(8000, function() {
-  console.log("listening on *:8000");
+  logger.info("listening on *:8000");
 });
